@@ -18,19 +18,9 @@ defmodule Liquidizer.Resizer do
         Logger.debug("Checking file #{path_to_file} for exists")
 
         unless File.exists?(path_to_file) do
-
             Logger.debug("Not found transformed file, checking original file")
 
-            unless File.exists?(path_to_original) do
-                Logger.debug("Not found original file. downloading...")
-                %HTTPoison.Response{body: body} = HTTPoison.get!(url)
-                Logger.debug("File Downloaded. Creating direcroty tree")
-                File.mkdir_p(path_to_dir);
-                Logger.debug("Directory tree created. Writing file")
-                File.write!(path_to_original, body)
-                Logger.debug("Done.")
-            end
-
+            check_and_download_file(path_to_original, url, path_to_dir)
             # I don't find any -output parametres for mogrify =(
                  
             File.copy!(path_to_original, path_to_file)
@@ -61,19 +51,8 @@ defmodule Liquidizer.Resizer do
         Logger.debug("Checking file #{path_to_file} for exists")
 
         unless File.exists?(path_to_file) do
-
             Logger.debug("Not found transformed file, checking original file")
-
-            unless File.exists?(path_to_original) do
-                Logger.debug("Not found original file. downloading...")
-                %HTTPoison.Response{body: body} = HTTPoison.get!(url)
-                Logger.debug("File Downloaded. Creating direcroty tree")
-                File.mkdir_p(path_to_dir);
-                Logger.debug("Directory tree created. Writing file")
-                File.write!(path_to_original, body)
-                Logger.debug("Done.")
-            end
-
+            check_and_download_file(path_to_original, url, path_to_dir)
             # I don't find any -output parametres for mogrify =(
             File.copy!(path_to_original, path_to_file)
             Logger.debug("Original file copied.")
@@ -87,6 +66,18 @@ defmodule Liquidizer.Resizer do
 
         # Mime type is hardcoded. Yep. Not good.
         %{mime_type: "jpeg", bindata: image_data}
+    end
+
+    defp check_and_download_file(path_to_original, url, path_to_dir) do
+        unless File.exists?(path_to_original) do
+            Logger.debug("Not found original file. downloading...")
+            result = HTTPoison.get!(url)
+            body = result.body
+            File.mkdir_p(path_to_dir);
+            Logger.debug("Directory tree created. Writing file")
+            File.write!(path_to_original, body)
+            Logger.debug("Done.")
+        end
     end
 
 end
