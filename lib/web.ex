@@ -11,7 +11,7 @@ defmodule Liquidizer.Web do
     end
 
     def start_link do
-        {:ok, _} = Plug.Adapters.Cowboy.http Liquidizer.Web, [], port: 4001
+        {:ok, _} = Plug.Adapters.Cowboy.http Liquidizer.Web, [], port: 4000
     end
 
     get "/resize" do
@@ -24,22 +24,20 @@ defmodule Liquidizer.Web do
                 conn = conn 
                 |> put_resp_content_type("image/#{mime}")
                 |> send_resp(200,  data)
-                |> halt
 
             %{ "url" => url, "h" => h, "w" => w} ->
                 %{mime_type: mime, bindata: data} = Liquidizer.Resizer.resize(url, h, w)
                 conn = conn 
                 |> put_resp_content_type("image/#{mime}")
                 |> send_resp(200,  data)
-                |> halt
             _ ->
                 Logger.error("Do not match any method for " <> inspect(conn.params))
                 conn = conn 
                 |> send_resp(400, "Bad bad bad request")
-                |> halt
+                
         end
 
-        conn
+        conn |> halt
     end
 
     match _ do 

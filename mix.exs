@@ -20,6 +20,7 @@ defmodule Liquidizer.Mixfile do
         {:cowboy, "~> 1.0.4"},
         {:plug, "~> 1.2"},
         {:httpoison, "~> 0.9.0"},
+        {:exrm, "~> 1.0.8"}
     ]
   end
 end
